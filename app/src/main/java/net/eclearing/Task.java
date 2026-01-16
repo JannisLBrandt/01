@@ -1,13 +1,12 @@
 package net.eclearing;
 
-class Task {
-    
-    int id;
-    String header;
-    String content;
+import java.time.LocalDateTime;
 
-    Task(String header, String content) {
-	this.header = header;
-	this.content = content;
-    }
-}
+public record Task(
+    long id,
+    LocalDateTime createdAt,
+    LocalDateTime modified_at,
+    LocalDateTime completed_at,
+    LocalDateTime deleted_at,
+    String title
+) {}
