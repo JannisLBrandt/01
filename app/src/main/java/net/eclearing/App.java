@@ -7,7 +7,9 @@ class App {
         TodoDao todoDao = new TodoDao();
         
         RoutingHandler routes = new RoutingHandler()
-            .get("/todos", new GetAllTodosHandler(todoDao));
+            .get("/todos", new GetAllTodosHandler(todoDao))
+            .post("todos", new AddTaskHandler(todoDao));
+        
         
         LocalServer server = new LocalServer(8080, "localhost", routes);
         server.start();

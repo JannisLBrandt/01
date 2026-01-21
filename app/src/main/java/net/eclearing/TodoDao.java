@@ -51,4 +51,21 @@ public class TodoDao {
         }
         return todos;
     }
+
+    public void addTask(String titleString) {
+
+        String sql = "INSERT INTO todos (created_at, modified_at, title) VALUES (?,?,?)";
+        
+        // create connection
+        try (Connection conn = DataSourceProvider.getConnection();
+PreparedStatement pstmt = conn.prepareStatement(sql);
+        ) {
+            pstmt.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
+            pstmt.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now()));
+            pstmt.setString(3, titleString);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to add task", e);
+        }
+    }
 }

@@ -1,0 +1,2 @@
+#!/bin/bash
+java -jar /Users/jannisbrandt/work/techstack/01/app/build/libs/todo-cli.jar "$@"
