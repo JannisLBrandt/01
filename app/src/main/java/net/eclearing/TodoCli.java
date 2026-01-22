@@ -16,7 +16,7 @@ import java.util.List;
     description = "CLI for managing todos")
 public class TodoCli implements Callable<Integer> {
     
-    @Option(names = {"--display-all"}, description = "Display all todos")
+    @Option(names = {"--display"}, description = "Display todos with defaults to limit and offset")
     private boolean displayAll;
     
     @Option(names = {"--limit"}, description = "Number of items to display", defaultValue = "10")
@@ -27,6 +27,9 @@ public class TodoCli implements Callable<Integer> {
 
     @Option(names = {"--add"}, description = "Add a new task")
     private String addTask;
+
+    @Option(names = {"--delete"}, description = "Delete a task by ID")
+    private Long deleteId;
     
     @Override
     public Integer call() throws Exception {
@@ -34,6 +37,8 @@ public class TodoCli implements Callable<Integer> {
             displayTodos();
         } else if (addTask != null) {
             addNewTask(addTask);
+        } else if (deleteId != null) {
+            deleteTask(deleteId);
         }
         return 0;
     }
@@ -60,7 +65,7 @@ public class TodoCli implements Callable<Integer> {
         // Create ASCII table
         AsciiTable table = new AsciiTable();
         table.addRule();
-        table.addRow("ID", "Title", "Created At", "Modified At", "Completed At", "Deleted At");
+        table.addRow("ID", "Title", "Created At", "Modified At", "Completed At");
         table.addRule();
     
         for (Task task : tasks) {
@@ -69,8 +74,7 @@ public class TodoCli implements Callable<Integer> {
                 task.title(),
                 task.createdAt() != null ? task.createdAt().toString() : "",
                 task.modifiedAt() != null ? task.modifiedAt().toString() : "",
-                task.completedAt() != null ? task.completedAt().toString() : "",
-                task.deletedAt() != null ? task.deletedAt().toString() : ""
+                task.completedAt() != null ? task.completedAt().toString() : ""
             );
             table.addRule();
         }
@@ -85,6 +89,18 @@ public class TodoCli implements Callable<Integer> {
             .uri(URI.create("http://localhost:8080/todos"))
             .header("Content-Type", "text/plain")
             .POST(HttpRequest.BodyPublishers.ofString(title))
+            .build();
+    
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println(response.body());
+    }
+
+    private void deleteTask(long id) throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+    
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create("http://localhost:8080/todos?id=" + id))
+            .DELETE()
             .build();
     
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());

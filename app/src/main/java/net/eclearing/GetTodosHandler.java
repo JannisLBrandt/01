@@ -9,19 +9,16 @@ import io.undertow.util.Headers;
 
 import java.util.List;
 
-public class GetAllTodosHandler implements HttpHandler {
+public class GetTodosHandler implements HttpHandler {
     private final TodoDao todoDao;
     
-    public GetAllTodosHandler(TodoDao todoDao) {
+    public GetTodosHandler(TodoDao todoDao) {
         this.todoDao = todoDao;
     }
     
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         try {
-            // TODO extract limit + offset from query
-            // TODO pass them in findAll()
-            // TODO return paginated result
 
             String limitParam = exchange.getQueryParameters().containsKey("limit") ? exchange.getQueryParameters().get("limit").getFirst() : null;
             String offsetParam = exchange.getQueryParameters().containsKey("offset") ? exchange.getQueryParameters().get("offset").getFirst() : null;
@@ -31,7 +28,7 @@ public class GetAllTodosHandler implements HttpHandler {
             // default to page 1
             int offset = (offsetParam != null) ? Integer.parseInt(offsetParam) : 0;
             
-            List<Task> todos = todoDao.findAll(limit,offset);
+            List<Task> todos = todoDao.display(limit,offset);
             String json = JSON.toJSONString(todos);
         
             exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");

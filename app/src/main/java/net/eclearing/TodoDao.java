@@ -17,9 +17,9 @@ import java.util.ArrayList;
 
 public class TodoDao {
 
-    public List<Task> findAll(int limit, int offset) {
+    public List<Task> display(int limit, int offset) {
 
-        String sql = "SELECT id, created_at, modified_at, completed_at, deleted_at, title FROM todos ORDER BY id ASC LIMIT ? OFFSET ?";
+        String sql = "SELECT id, created_at, modified_at, completed_at, title FROM todos ORDER BY id ASC LIMIT ? OFFSET ?";
         
         List<Task> todos = new ArrayList<>();
 
@@ -32,14 +32,13 @@ public class TodoDao {
             pstmt.setInt(2, offset);
 
             try (ResultSet result = pstmt.executeQuery()) {
-                // TODO execute statement here
                 while (result.next()) {
                     Task task = new Task(
                         result.getLong("id"),
                         result.getTimestamp("created_at").toLocalDateTime(),
                         result.getTimestamp("modified_at").toLocalDateTime(),
                         result.getTimestamp("completed_at") != null ? result.getTimestamp("completed_at").toLocalDateTime() : null,
-                        result.getTimestamp("deleted_at") != null ? result.getTimestamp("deleted_at").toLocalDateTime() : null,
+                        null,
                         result.getString("title")
                     );
                     todos.add(task);
@@ -52,13 +51,14 @@ public class TodoDao {
         return todos;
     }
 
+    // add a task via a String
     public void addTask(String titleString) {
 
         String sql = "INSERT INTO todos (created_at, modified_at, title) VALUES (?,?,?)";
         
         // create connection
         try (Connection conn = DataSourceProvider.getConnection();
-PreparedStatement pstmt = conn.prepareStatement(sql);
+            PreparedStatement pstmt = conn.prepareStatement(sql);
         ) {
             pstmt.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
             pstmt.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now()));
@@ -68,4 +68,20 @@ PreparedStatement pstmt = conn.prepareStatement(sql);
             throw new RuntimeException("Failed to add task", e);
         }
     }
+
+    // delete a task by id
+    public void deleteTask(long id) {
+
+        String sql = "DELETE FROM todos WHERE id=?";
+
+        try (Connection conn = DataSourceProvider.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+        ) {
+            pstmt.setLong(1, id);
+            pstmt.executeUpdate();            
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to delete task", e);
+        }
+    }
+    
 }
