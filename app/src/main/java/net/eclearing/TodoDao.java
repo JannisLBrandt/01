@@ -54,6 +54,15 @@ public class TodoDao {
     // add a task via a String
     public void addTask(String titleString) {
 
+        // validate input
+        if (titleString == null || titleString.trim().isEmpty()) {
+            throw new IllegalArgumentException("Title cannot be empty or spaces only!");
+        }
+
+        if (titleString.length() > 255) {
+            throw new IllegalArgumentException("Title cannot exceed 250 characters!");
+        }
+        
         String sql = "INSERT INTO todos (created_at, modified_at, title) VALUES (?,?,?)";
         
         // create connection
@@ -72,6 +81,11 @@ public class TodoDao {
     // delete a task by id
     public void deleteTask(long id) {
 
+        // input validation
+        if (id <= 0) {
+            throw new IllegalArgumentException("Id cannot be zero or smaller!");
+        }
+
         String sql = "UPDATE todos SET deleted_at=? WHERE id=?";
 
         try (Connection conn = DataSourceProvider.getConnection();
@@ -79,7 +93,13 @@ public class TodoDao {
         ) {
             pstmt.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
             pstmt.setLong(2, id);
-            pstmt.executeUpdate();            
+
+            // check if data for the id even exists
+            int rowsEffected = pstmt.executeUpdate();
+
+            if (rowsEffected == 0 ) {
+                throw new IllegalArgumentException("Task with id " + id + " not found" );
+            }
         } catch (SQLException e) {
             throw new RuntimeException("Failed to delete task", e);
         }

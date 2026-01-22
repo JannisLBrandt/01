@@ -23,13 +23,13 @@ public class AddTaskHandler implements HttpHandler {
                 } catch (Exception e) {
                     e.printStackTrace();
                     ex.setStatusCode(500);
-                    ex.getResponseSender().send("{\"error\":\"Task created\"}");
+                    ex.getResponseSender().send("{\"error\":\"Task not created\"}");
                 }
             });
         } catch (Exception e) {
             e.printStackTrace();
             exchange.setStatusCode(500);
-            exchange.getResponseSender().send("{\"error\":\"Task created\"}");
+            exchange.getResponseSender().send("{\"error\":\"Task not created\"}");
         }
     }
 }
