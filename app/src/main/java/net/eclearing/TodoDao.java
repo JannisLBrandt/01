@@ -19,7 +19,7 @@ public class TodoDao {
 
     public List<Task> display(int limit, int offset) {
 
-        String sql = "SELECT id, created_at, modified_at, completed_at, title FROM todos ORDER BY id ASC LIMIT ? OFFSET ?";
+        String sql = "SELECT id, created_at, modified_at, completed_at, title FROM todos WHERE deleted_at IS NULL ORDER BY id ASC LIMIT ? OFFSET ?";
         
         List<Task> todos = new ArrayList<>();
 
@@ -72,12 +72,13 @@ public class TodoDao {
     // delete a task by id
     public void deleteTask(long id) {
 
-        String sql = "DELETE FROM todos WHERE id=?";
+        String sql = "UPDATE todos SET deleted_at=? WHERE id=?";
 
         try (Connection conn = DataSourceProvider.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql);
         ) {
-            pstmt.setLong(1, id);
+            pstmt.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
+            pstmt.setLong(2, id);
             pstmt.executeUpdate();            
         } catch (SQLException e) {
             throw new RuntimeException("Failed to delete task", e);
