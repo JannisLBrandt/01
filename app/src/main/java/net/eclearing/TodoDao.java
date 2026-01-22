@@ -84,5 +84,21 @@ public class TodoDao {
             throw new RuntimeException("Failed to delete task", e);
         }
     }
+
+    // mark task as completed by id
+    public void completeTask(long id) {
+
+        String sql = "UPDATE todos SET completed_at=? WHERE id=?";
+
+        try (Connection conn = DataSourceProvider.getConnection();
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        ) {
+            pstmt.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
+            pstmt.setLong(2, id);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to complete task", e);
+        }
+    }
     
 }

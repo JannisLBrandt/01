@@ -17,7 +17,7 @@ import java.util.List;
 public class TodoCli implements Callable<Integer> {
     
     @Option(names = {"--display"}, description = "Display todos with defaults to limit and offset")
-    private boolean displayAll;
+    private boolean display;
     
     @Option(names = {"--limit"}, description = "Number of items to display", defaultValue = "10")
     private int limit;
@@ -28,17 +28,22 @@ public class TodoCli implements Callable<Integer> {
     @Option(names = {"--add"}, description = "Add a new task")
     private String addTask;
 
-    @Option(names = {"--delete"}, description = "Delete a task by ID")
+    @Option(names = {"--delete"}, description = "Mark a task as delete by ID")
     private Long deleteId;
+
+    @Option(names = {"--complete"}, description = "Mark a task completed by ID")
+    private Long completeId;
     
     @Override
     public Integer call() throws Exception {
-        if (displayAll) {
+        if (display) {
             displayTodos();
         } else if (addTask != null) {
             addNewTask(addTask);
         } else if (deleteId != null) {
             deleteTask(deleteId);
+        } else if (completeId != null) {
+            completeTask(completeId);
         }
         return 0;
     }
@@ -103,6 +108,18 @@ public class TodoCli implements Callable<Integer> {
             .DELETE()
             .build();
     
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println(response.body());
+    }
+
+    private void completeTask(long id) throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create("http://localhost:8080/todos?id=" + id))
+            .PUT(HttpRequest.BodyPublishers.noBody())
+            .build();
+
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         System.out.println(response.body());
     }

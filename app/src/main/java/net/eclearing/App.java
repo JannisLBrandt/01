@@ -9,7 +9,8 @@ class App {
         RoutingHandler routes = new RoutingHandler()
             .get("/todos", new GetTodosHandler(todoDao))
             .post("todos", new AddTaskHandler(todoDao))
-        .delete("/todos", new DeleteTaskHandler(todoDao));
+            .delete("/todos", new DeleteTaskHandler(todoDao))
+            .put("/todos", new CompleteTaskHandler(todoDao));
         
         
         LocalServer server = new LocalServer(8080, "localhost", routes);
