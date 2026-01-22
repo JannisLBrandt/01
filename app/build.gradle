@@ -8,12 +8,20 @@ repositories {
 
 dependencies {
     implementation libs.guava
+    // undertow server
     implementation 'io.undertow:undertow-core:2.3.20.Final'
+    // HikariCP connection pooling
     implementation 'com.zaxxer:HikariCP:5.1.0'
+    // postgres, database
     implementation 'org.postgresql:postgresql:42.7.8'
+    // json parsing
     implementation 'com.alibaba.fastjson2:fastjson2:2.0.60'
+    // .env management
     implementation 'io.github.cdimascio:dotenv-java:3.2.0'
+    // cli
     implementation 'info.picocli:picocli:4.7.7'
+    // ascii table
+    implementation 'de.vandermeer:asciitable:0.3.2'
 }
 
 testing {

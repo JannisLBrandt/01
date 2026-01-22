@@ -8,9 +8,12 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.concurrent.Callable;
+import com.alibaba.fastjson2.JSON;
+import de.vandermeer.asciitable.AsciiTable;
+import java.util.List;
 
 @Command(name = "todo", mixinStandardHelpOptions = true, version = "1.0",
-         description = "CLI for managing todos")
+    description = "CLI for managing todos")
 public class TodoCli implements Callable<Integer> {
     
     @Option(names = {"--display-all"}, description = "Display all todos")
@@ -38,14 +41,41 @@ public class TodoCli implements Callable<Integer> {
     private void displayTodos() throws Exception {
         HttpClient client = HttpClient.newHttpClient();
         String url = String.format("http://localhost:8080/todos?limit=%d&offset=%d", limit, offset);
-        
+    
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(url))
             .GET()
             .build();
-        
+    
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println(response.body());
+    
+        // Parse JSON to List<Task>
+        List<Task> tasks = JSON.parseArray(response.body(), Task.class);
+    
+        if (tasks.isEmpty()) {
+            System.out.println("No tasks found.");
+            return;
+        }
+    
+        // Create ASCII table
+        AsciiTable table = new AsciiTable();
+        table.addRule();
+        table.addRow("ID", "Title", "Created At", "Modified At", "Completed At", "Deleted At");
+        table.addRule();
+    
+        for (Task task : tasks) {
+            table.addRow(
+                task.id(),
+                task.title(),
+                task.createdAt() != null ? task.createdAt().toString() : "",
+                task.modifiedAt() != null ? task.modifiedAt().toString() : "",
+                task.completedAt() != null ? task.completedAt().toString() : "",
+                task.deletedAt() != null ? task.deletedAt().toString() : ""
+            );
+            table.addRule();
+        }
+    
+        System.out.println(table.render());
     }
 
     private void addNewTask(String title) throws Exception {
