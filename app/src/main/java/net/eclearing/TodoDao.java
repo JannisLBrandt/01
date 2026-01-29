@@ -16,7 +16,14 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class TodoDao {
-
+    
+    /**
+     * Function to display todos, based on a limit and offset
+     *
+     * @param limit amount of tasks to display
+     * @param offset start for displaying until limit
+     * @return List<Task> a List of the tasks that fit
+     */
     public List<Task> display(int limit, int offset) {
 
         String sql = "SELECT id, created_at, modified_at, completed_at, title FROM todos WHERE deleted_at IS NULL ORDER BY id ASC LIMIT ? OFFSET ?";
@@ -50,8 +57,12 @@ public class TodoDao {
         }
         return todos;
     }
-
-    // add a task via a String
+    
+    /**
+     * Function to add a single task with a custom string.
+     *
+     * @param titleString the title of the task
+     */
     public void addTask(String titleString) {
 
         // validate input
@@ -77,8 +88,12 @@ public class TodoDao {
             throw new RuntimeException("Failed to add task", e);
         }
     }
-
-    // delete a task by id
+    
+    /**
+     * Function to delete a single task by id
+     *
+     * @param id the tasks id to be delete
+     */
     public void deleteTask(long id) {
 
         // input validation
@@ -105,7 +120,11 @@ public class TodoDao {
         }
     }
 
-    // mark task as completed by id
+    /**
+     * Function to mark task as completed
+     *
+     * @param id the tasks id to be marked as completed
+     */
     public void completeTask(long id) {
 
         String sql = "UPDATE todos SET completed_at=? WHERE id=?";
