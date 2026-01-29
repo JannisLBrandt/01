@@ -10,7 +10,8 @@ class App {
             .get("/todos", new GetTodosHandler(todoDao))
             .post("todos", new AddTaskHandler(todoDao))
             .delete("/todos", new DeleteTaskHandler(todoDao))
-            .put("/todos", new CompleteTaskHandler(todoDao));
+            .put("/todos", new CompleteTaskHandler(todoDao))
+            .put("/todos", new UpdateTitleHandler(todoDao));
         
         
         LocalServer server = new LocalServer(8080, "localhost", routes);
