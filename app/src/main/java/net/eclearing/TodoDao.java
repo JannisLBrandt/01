@@ -139,5 +139,24 @@ public class TodoDao {
             throw new RuntimeException("Failed to complete task", e);
         }
     }
+
+    /**
+     * Function to edit the title of a task selected by its id
+     *
+     * @param id the tasks id to edit
+     */
+    public void updateTitle(String newTitle, long id) {
+      String sql = "UPDATE todos SET title=? WHERE id=?";
+
+      try (Connection conn = DataSourceProvider.getConnection();
+          PreparedStatement pstmt = conn.prepareStatement(sql);
+          ) {
+              pstmt.setString(1, newTitle);
+              pstmt.setLong(2, id);
+              pstmt.executeUpdate();
+          } catch (SQLException e) {
+            throw new RuntimeException("Failed to update task title", e);
+          }
+    }
     
 }
