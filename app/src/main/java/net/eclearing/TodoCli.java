@@ -33,7 +33,13 @@ public class TodoCli implements Callable<Integer> {
 
     @Option(names = {"--complete"}, description = "Mark a task completed by ID")
     private Long completeId;
-    
+
+    @Option(names = {"--new-title"}, description = "New string for task title")
+    private String newTitle;
+
+    @Option(names = {"--id"}, description = "the tasks id")
+    private Long id;
+
     @Override
     public Integer call() throws Exception {
         if (display) {
@@ -44,6 +50,8 @@ public class TodoCli implements Callable<Integer> {
             deleteTask(deleteId);
         } else if (completeId != null) {
             completeTask(completeId);
+        } else if (newTitle != null && id != null) {
+          updateTitle(newTitle,id);
         }
         return 0;
     }
@@ -122,6 +130,19 @@ public class TodoCli implements Callable<Integer> {
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         System.out.println(response.body());
+    }
+
+    private void updateTitle(String newTitle, long id) throws Exception {
+      HttpClient client = HttpClient.newHttpClient();
+
+      HttpRequest request = HttpRequest.newBuilder()
+        .uri(URI.create("http://localhost:8080/todos?id=" + id))
+        .header("Content-Type", "text/plain")
+        .PUT(HttpRequest.BodyPublishers.ofString(newTitle))
+        .build();
+
+      HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+      System.out.println(response.body());
     }
     
     public static void main(String[] args) {

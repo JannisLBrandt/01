@@ -12,11 +12,13 @@ public class UpdateTitleHandler implements HttpHandler {
   }
 
   @Override
-  public void handleRequest(HttpServerExchange exchange) throws Exceptio {
+  public void handleRequest(HttpServerExchange exchange) throws Exception {
     try {
-      exchange.getRequestReceiver().receiverFullString((ex, title) -> {
+            String idP = exchange.getQueryParameters().get("id").getFirst();
+            long id = Long.parseLong(idP);
+            exchange.getRequestReceiver().receiveFullString((ex, title) -> {
         try {
-          todoDao.updateTitle(title);
+          todoDao.updateTitle(title, id);
           ex.setStatusCode(201);
           ex.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
           ex.getResponseSender().send("{\"message\":\"Task title updated\"}");
